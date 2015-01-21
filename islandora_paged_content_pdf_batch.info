@@ -1,0 +1,10 @@
+name = Islandora Paged Content PDF Batch
+description = "Batch ingest objects"
+package = Islandora
+version = 7.x-dev
+core = 7.x
+dependencies[] = islandora_batch
+dependencies[] = islandora_paged_content
+files[] = includes/batch.inc
+php = 5.3
+
