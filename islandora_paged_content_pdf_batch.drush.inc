@@ -19,45 +19,48 @@ function islandora_paged_content_pdf_batch_drush_command() {
       'islandora_paged_content_pdf_batch'),
     'options' => array(
       'target' => array(
-        'description' => 'The target to the zip file to scan.',
+        'description' => dt('The target to the ZIP file to scan.'),
         'required' => TRUE,
       ),
       'text' => array(
-        'description' => 'One of the following options: "extract" to pull the text out of the PDF, "ocr" to run OCR against the PDF or "none". Defaults to "extract"',
+        'description' => dt('One of the following options: "extract" to pull the text out of the PDF, "ocr" to run OCR against the PDF or "none". Defaults to "extract"'),
         'value' => 'optional',
       ),
       'language' => array(
-        'description' => 'Valid short code for OCR extraction. Defaults to "eng".',
+        'description' => dt('Valid short code for OCR extraction. Defaults to "eng".'),
         'value' => 'optional',
       ),
       'format' => array(
-        'description' => 'The image format to use to when extracting images from PDF. Defaults to "tiff32nc"',
+        'description' => dt('The image format to use to when extracting images from PDF. Defaults to "tiff32nc"'),
         'value' => 'optional',
       ),
       'resolution' => array(
-        'description' => 'The resolution to use in pixels. Defaults to "300"',
+        'description' => dt('The resolution to use in pixels. Defaults to "300"'),
         'value' => 'optional',
       ),
       'content_model' => array(
-        'description' => 'The content model to assign to the parent objects.',
+        'description' => dt('The content model to assign to the parent objects.'),
         'required' => TRUE,
       ),
       'parent' => array(
-        'description' => 'The collection or pid to which the generated items should be added to.',
+        'description' => dt('The collection or pid to which the generated items should be added to.'),
         'required' => TRUE,
       ),
       'parent_relationship_uri' => array(
-        'description' => 'The namespace URI of the relationship to the parent. Defaults to "info:fedora/fedora-system:def/relations-external#".',
+        'description' => dt('The namespace URI of the relationship to the parent. Defaults to "info:fedora/fedora-system:def/relations-external#".'),
         'value' => 'optional',
       ),
       'parent_relationship_pred' => array(
-        'description' => 'The predicate of the relationship to the parent. Defaults to "isMemberOfCollection".',
+        'description' => dt('The predicate of the relationship to the parent. Defaults to "isMemberOfCollection".'),
         'value' => 'optional',
+      ),
+      'namespace' => array(
+        'description' => dt('The namespace for objects created by this command.  Defaults to namespace set in Fedora config.'),
+        'required' => FALSE,
       ),
     ),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
   );
-
   return $items;
 }
 
@@ -165,6 +168,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
     'parent' => drush_get_option('parent'),
     'parent_relationship_uri' => drush_get_option('parent_relationship_uri', 'info:fedora/fedora-system:def/relations-external#'),
     'parent_relationship_pred' => drush_get_option('parent_relationship_pred', 'isMemberOfCollection'),
+    'namespace' => drush_get_option('namespace'),
   );
 
   if ($text = drush_get_option('text', 'extract')) {

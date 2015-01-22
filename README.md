@@ -2,7 +2,8 @@
 
 ## Introduction
 
-This module implements a batch framework, as well as a basic ZIP ingester.
+This module extends the [Islandora Batch](https://github.com/islandora/islandora_batch) framework to facilitate the ingestion of
+a ZIP filled with one or more PDFs into paged content and individual page objects.
 
 The ingest is a two-step process:
 
@@ -19,15 +20,12 @@ This module requires the following modules/libraries:
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
 * [Islandora Paged Content](https://github.com/islandora/islandora_paged_content)
+* [Islandora Batch](https://github.com/islandora/islandora_batch)
 
 
 # Installation
 
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
-
-## Configuration
-
-N/A
 
 ### Usage
 

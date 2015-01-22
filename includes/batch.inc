@@ -82,14 +82,6 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
   }
 
   /**
-   * Function initialBatchState.
-   */
-  public function initialBatchState() {
-    // Not ready until we've added the pages.
-    return ISLANDORA_BATCH_STATE__NOT_READY;
-  }
-
-  /**
    * Function getTitle().
    */
   public function getTitle() {
