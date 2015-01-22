@@ -14,10 +14,13 @@ before_install:
   - cd $HOME
   - git clone -b 7.x git://github.com/Islandora/islandora.git
   - git clone -b 7.x git://github.com/Islandora/islandora_paged_content.git
+  - git clone -b 7.x git://github.com/Islandora/islandora_batch.git
   - export ISLANDORA_DIR=$HOME/islandora
   - $HOME/islandora/tests/scripts/travis_setup.sh
   - cd $HOME/drupal-*
   - ln -s $TRAVIS_BUILD_DIR sites/all/modules/islandora_paged_content_pdf_batch
+  - ln -s $HOME/islandora_batch sites/all/modules/islandora_batch
+  - ln -s $HOME/islandora_paged_content sites/all/modules/islandora_paged_content
   - drush en --yes islandora_paged_content_pdf_batch
 script:
   - ant -buildfile sites/all/modules/islandora_paged_content_pdf_batch/build.xml lint
