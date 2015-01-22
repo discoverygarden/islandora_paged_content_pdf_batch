@@ -31,13 +31,13 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 The base ZIP preprocessor can be called as a drush script (see `drush help islandora_paged_content_pdf_batch_preprocess` for additional parameters):
 
-`drush -v --user=admin --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content-model=islandora:bookCModel --parent=islandora:bookCollection`
+`drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content-model=islandora:bookCModel --parent=islandora:bookCollection`
 
 This will populate the queue (stored in the Drupal database) with base entries.
 
 The queue of preprocessed items can then be processed:
 
-`drush -v --user=admin --uri=http://localhost islandora_batch_ingest`
+`drush -v -u 1 --uri=http://localhost islandora_batch_ingest`
 
 Currently, the ingester has only been tested with the [Book](https://github.com/islandora/islandora_solution_pack_book) and [Newspaper](https://github.com/islandora/islandora_solution_pack_newspaper) solution packs. Other paged content may need to extend and customize the batch as noted below.
 
