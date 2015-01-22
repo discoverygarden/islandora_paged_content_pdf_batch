@@ -18,16 +18,13 @@ class IslandoraPagedContentPDFBatch extends IslandoraScanBatch {
 
   /**
    * Get the type of the target resource.
-   *
-   * Prefixed with "scan_" to determine which method gets called to generate
-   * the list of resource.
    */
   protected function getTargetType() {
     return 'zip';
   }
 
   /**
-   * Function preprocess.
+   * Preprocess all the things.
    */
   public function preprocess() {
     $this->parameters['set_id'] = $this->getSetId();
@@ -82,14 +79,14 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
   }
 
   /**
-   * Function getTitle().
+   * Returns the label as the title for the object.
    */
   public function getTitle() {
     return $this->label;
   }
 
   /**
-   * Function getChildren.
+   * Get the children of the paged content parent.
    */
   public function getChildren(IslandoraTuque $connection) {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
@@ -105,13 +102,6 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
       $children[] = new IslandoraPagedContentPDFBatchPageObject($connection, $this->id, $this->preprocessorParameters['content_model'], $sequence, $file->fid, $this->preprocessorParameters);
     }
     return $children;
-  }
-
-  /**
-   * Function addRelationships.
-   */
-  public function addRelationships() {
-    parent::addRelationships();
   }
 
   /**
@@ -135,7 +125,7 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
 }
 
 /**
- * Class IslandoraPagedContentPDFBatchChildObject.
+ * Constructs the child objects for paged content.
  */
 class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
   protected $parentId;
@@ -147,7 +137,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
   protected $pdfFile;
 
   /**
-   * Function construct.
+   * Constructorsaurusrex.
    */
   public function __construct(IslandoraTuque $connection, $parent_id, $parent_cmodel, $sequence, $fid, $pp) {
     $this->pdfFile = $fid;
@@ -171,14 +161,14 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
   }
 
   /**
-   * Function getTitle().
+   * Returns the label as the title for the object.
    */
   public function getTitle() {
     return $this->label;
   }
 
   /**
-   * Function batch_process.
+   * Batch process that goes out and constructs the datastreams for the child.
    */
   public function batchProcess() {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
@@ -210,7 +200,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
   }
 
   /**
-   * Function getChildren.
+   * Returns the children which there are none.
    */
   public function getChildren(IslandoraTuque $connection) {
     // Pages should not have children.
@@ -218,15 +208,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
   }
 
   /**
-   * Function initialBatchState.
-   */
-  public function initialBatchState() {
-    // Not ready.
-    return ISLANDORA_BATCH_STATE__NOT_READY;
-  }
-
-  /**
-   * Function addRelationships.
+   * Adds relationships needed for the children of paged content.
    */
   public function addRelationships() {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
