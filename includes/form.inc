@@ -28,7 +28,8 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     $models = array_intersect_key($applicable_paged_cmodels, $cp->getContentModels());
   }
   else {
-    // Not a collection do some shenanigans.
+    // Not a collection do some shenanigans to find the potential child content
+    // models from the registry hook.
     $models = array();
     foreach ($applicable_paged_cmodels as $parent => $values) {
       if (isset($values['parent']) && in_array($values['parent'], $object->models)) {
@@ -43,7 +44,6 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     $model = key($models);
   }
   $form = islandora_paged_content_upload_pdf_form($form, $form_state, $model);
-  // Remove some things we don't need from the base form.
   if (!$model) {
     $form['model'] = array(
       '#type' => 'select',
@@ -64,7 +64,7 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     '#title' => t('Zip file'),
     '#description' => t('A Zip file containing a number of PDFs.'),
     '#required' => TRUE,
-    '#upload_location' => 'public://',
+    '#upload_location' => file_default_scheme(),
     '#upload_validators' => array(
       'file_validate_extensions' => array('zip'),
     ),
@@ -78,7 +78,7 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     '#type' => 'checkbox',
     '#title' => t('Ingest immediately?'),
     '#description' => t('If not selected, objects will just be preprocessed into the queue of objects to be ingested, to be fully-processed (and ingested) later--whenever an admin deems it an appropriate time.'),
-    '#default_value' => TRUE,
+    '#default_value' => FALSE,
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -107,13 +107,10 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
     'resolution' => $form_state['values']['resolution'],
     'content_model' => $form_state['values']['model'],
     'parent' => $form_state['values']['parent'],
-    'parent_relationship_uri' => 'info:fedora/fedora-system:def/relations-external#',
+    'parent_relationship_uri' => FEDORA_RELS_EXT_URI,
     'parent_relationship_pred' => $predicate,
   );
   $preprocessor = new IslandoraPagedContentPDFBatch($connection, $parameters);
-  // XXX: We currently do not have a place where we remove usages, as we never
-  // really delete "sets" (or "items", for that matter)...  To come in the
-  // management side of things, in INT-192?
   file_usage_add($target, 'islandora_batch', 'islandora_batch_set', $preprocessor->getSetId());
   if ($form_state['values']['ingest_set_immediately']) {
     islandora_batch_ingest(array(

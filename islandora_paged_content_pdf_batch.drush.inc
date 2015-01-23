@@ -169,7 +169,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
     'target' => drush_get_option('target'),
     'content_model' => drush_get_option('content_model'),
     'parent' => drush_get_option('parent'),
-    'parent_relationship_uri' => drush_get_option('parent_relationship_uri', 'info:fedora/fedora-system:def/relations-external#'),
+    'parent_relationship_uri' => drush_get_option('parent_relationship_uri', FEDORA_RELS_EXT_URI),
     'parent_relationship_pred' => drush_get_option('parent_relationship_pred', 'isMemberOfCollection'),
     'namespace' => drush_get_option('namespace'),
   );
