@@ -10,7 +10,8 @@
  */
 function islandora_paged_content_pdf_batch_drush_command() {
   $items = array();
-
+  module_load_include('inc', 'islandora_paged_content_pdf_batch', 'includes/utilities');
+  $valid_languages = islandora_paged_content_pdf_batch_available_languages();
   $items['islandora_paged_content_pdf_batch_preprocess'] = array(
     'aliases' => array('ipcpbp'),
     'description' => 'Preprocessed paged content and their children into database entries.',
@@ -19,7 +20,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
       'islandora_paged_content_pdf_batch'),
     'options' => array(
       'target' => array(
-        'description' => dt('The target to the ZIP file to scan.'),
+        'description' => dt('The path to the ZIP file to scan.'),
         'required' => TRUE,
       ),
       'text' => array(
@@ -27,11 +28,22 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'value' => 'optional',
       ),
       'language' => array(
-        'description' => dt('Valid short code for OCR extraction. Defaults to "eng".'),
+        'description' => dt('Valid short code for OCR extraction. Valid options are: @languages. Defaults to "eng".', array(
+          '@languages' => implode(', ', $valid_languages),
+        )),
         'value' => 'optional',
       ),
       'format' => array(
-        'description' => dt('The image format to use to when extracting images from PDF. Defaults to "tiff32nc"'),
+        'description' => dt('The image format to use to when extracting images from PDF. Valid options are: @options. Defaults to "tiff32nc"', array(
+          '@options' => implode(', ', array(
+            'tiffgray',
+            'tiff12nc',
+            'tiff24nc',
+            'tiff48nc',
+            'tiff32nc',
+            'tiff64nc',
+          )),
+        )),
         'value' => 'optional',
       ),
       'resolution' => array(
@@ -84,7 +96,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
       'none',
     );
     if (!in_array($text, $valid_text_extraction)) {
-      return drush_set_error('Invalid text extraction', dt('The specified text extraction type, !text, is not valid.', array(
+      return drush_set_error('Invalid text extraction', dt('The specified text extraction type, !text, is not valid. Options available are "extract", "ocr" or "none".', array(
         '!text' => $text,
       )));
     }
@@ -96,29 +108,12 @@ function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
     }
   }
   if ($language = drush_get_option('language', 'eng')) {
-    if (module_exists('islandora_ocr')) {
-      module_load_include('inc', 'islandora_ocr', 'includes/utilities');
-
-      $valid_languages = islandora_ocr_get_enabled_tesseract_languages();
-      // Don't need the no OCR option.
-      unset($valid_languages['no_ocr']);
-      $valid_languages = array_keys($valid_languages);
-    }
-    else {
-      $valid_languages = array(
-        'eng',
-        'fra',
-        'deu-frak',
-        'por',
-        'spa',
-        'hin',
-        'jpn',
-        'ita',
-      );
-    }
+    module_load_include('inc', 'islandora_paged_content_pdf_batch', 'includes/utilities');
+    $valid_languages = islandora_paged_content_pdf_batch_available_languages();
     if (!in_array($language, $valid_languages)) {
-      return drush_set_error('Invalid language entered', dt('The specified language, !language, is not valid.', array(
+      return drush_set_error('Invalid language entered', dt('The specified language, !language, is not valid. Languages available are: @lang.', array(
         '!language' => $language,
+        '@lang' => implode(', ', $valid_languages),
       )));
     }
   }
@@ -133,8 +128,9 @@ function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
       'tiff64nc',
     );
     if (!in_array($format, $valid_formats)) {
-      return drush_set_error('Invalid format entered', dt('The specified format, !format, is not valid.', array(
+      return drush_set_error('Invalid format entered', dt('The specified format, !format, is not valid. Formats available are: @formats.', array(
         '!format' => $format,
+        '@formats' => implode(', ', $valid_formats),
       )));
     }
   }
