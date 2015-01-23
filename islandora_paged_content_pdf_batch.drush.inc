@@ -30,7 +30,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'value' => 'optional',
       ),
       'format' => array(
-        'description' => dt('The image format to use to when extracting images from PDF. Valid options are: @options. Defaults to "tiff32nc"', array(
+        'description' => dt('The image format to use to when extracting images from PDF. Valid options are: @options. Defaults to "tiff32nc".', array(
           '@options' => implode(', ', array(
             'tiffgray',
             'tiff12nc',
@@ -81,6 +81,21 @@ function islandora_paged_content_pdf_batch_drush_command() {
 function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
 
+  // See if the target specified exists and is a ZIP.
+  $target = drush_get_option('target');
+  if (file_exists($target)) {
+    $allowed_zips = array(
+      'application/zip',
+      'application/x-zip',
+    );
+    $mime = file_get_mimetype($target);
+    if (!in_array($mime, $allowed_zips)) {
+      return drush_set_error('Invalid MIME', dt('The specified file is not a ZIP.'));
+    }
+  }
+  else {
+    return drush_set_error('Missing file', dt('Unable to locate the ZIP file specified at @zip.', array('@zip' => $target)));
+  }
   // See if pdfinfo is available.
   if (!islandora_paged_content_pdfinfo_availability()) {
     return drush_set_error('Missing pdfinfo', dt('Unable to ingest as pdfinfo is missing.'));
