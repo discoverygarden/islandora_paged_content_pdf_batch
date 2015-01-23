@@ -68,7 +68,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
       ),
     ),
     'examples' => array(
-      'drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content-model=islandora:bookCModel --parent=islandora:bookCollection' => t('Preprocessing paged content.'),
+      'drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content_model=islandora:bookCModel --parent=islandora:bookCollection' => t('Preprocessing paged content.'),
     ),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
   );
