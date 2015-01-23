@@ -59,12 +59,13 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     '#size' => 15,
   );
   unset($form['pdf_file']);
+  $scheme = file_default_scheme();
   $form['target'] = array(
     '#type' => 'managed_file',
     '#title' => t('Zip file'),
     '#description' => t('A Zip file containing a number of PDFs.'),
     '#required' => TRUE,
-    '#upload_location' => file_default_scheme(),
+    '#upload_location' => "$scheme://",
     '#upload_validators' => array(
       'file_validate_extensions' => array('zip'),
     ),
