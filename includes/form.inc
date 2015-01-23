@@ -108,6 +108,7 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
     'resolution' => $form_state['values']['resolution'],
     'content_model' => $form_state['values']['model'],
     'parent' => $form_state['values']['parent'],
+    'namespace' => $form_state['values']['namespace'],
     'parent_relationship_uri' => FEDORA_RELS_EXT_URI,
     'parent_relationship_pred' => $predicate,
   );
