@@ -232,6 +232,6 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
     }
     // Add content model relationship.
     $paged_cmodels = islandora_paged_content_retrieve_applicable_cmodels();
-    $this->models = $paged_cmodels[$this->parentCModel];
+    $this->models = array_keys($paged_cmodels[$this->parentCModel]['children']);
   }
 }
