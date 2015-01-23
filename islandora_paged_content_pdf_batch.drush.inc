@@ -10,8 +10,6 @@
  */
 function islandora_paged_content_pdf_batch_drush_command() {
   $items = array();
-  module_load_include('inc', 'islandora_paged_content_pdf_batch', 'includes/utilities');
-  $valid_languages = islandora_paged_content_pdf_batch_available_languages();
   $items['islandora_paged_content_pdf_batch_preprocess'] = array(
     'aliases' => array('ipcpbp'),
     'description' => 'Preprocessed paged content and their children into database entries.',
@@ -28,9 +26,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'value' => 'optional',
       ),
       'language' => array(
-        'description' => dt('Valid short code for OCR extraction. Valid options are: @languages. Defaults to "eng".', array(
-          '@languages' => implode(', ', $valid_languages),
-        )),
+        'description' => dt('Valid short code for OCR extraction. Defaults to "eng".'),
         'value' => 'optional',
       ),
       'format' => array(
