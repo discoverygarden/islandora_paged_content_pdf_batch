@@ -174,6 +174,16 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
     module_load_include('inc', 'islandora', 'includes/utilities');
     $file = file_load($this->pdfFile);
+    $pdf = islandora_paged_content_chop_pdf($file->uri, $this->sequenceNumber);
+    if ($pdf) {
+      islandora_paged_content_update_datastream($this, $pdf, 'PDF', 'PDF', 'application/pdf', 'M');
+      $pdf_file = islandora_temp_file_entry($pdf);
+      file_usage_add($pdf_file, 'islandora_batch', 'islandora_batch_object', $this->getBatchId());
+    }
+    else {
+      watchdog('islandora_paged_content_pdf_batch', 'Unable to chop a PDF from the PDF for @pid.', array('@pid' => $this->id));
+      return ISLANDORA_BATCH_STATE__ERROR;
+    }
     $tif = islandora_paged_content_extract_tiff_from_pdf($file->uri, $this->sequenceNumber, $this->displayFormat, $this->resolution);
     if ($tif) {
       islandora_paged_content_update_datastream($this, $tif, 'OBJ', 'OBJ Datastream', 'image/tiff', 'M', FALSE);
