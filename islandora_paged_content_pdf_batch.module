@@ -55,8 +55,8 @@ function islandora_paged_content_pdf_batch_menu_access(AbstractObject $object) {
     $applicable_paged_cmodels = islandora_paged_content_retrieve_applicable_cmodels();
     $parents = array();
     foreach ($applicable_paged_cmodels as $values) {
-      if (isset($values['parent'])) {
-        $parents[] = $values['parent'];
+      if (isset($values['parents'])) {
+        $parents = array_merge($parents, array_keys($values['parents']));
       }
     }
     return array_intersect($parents, $object->models);
