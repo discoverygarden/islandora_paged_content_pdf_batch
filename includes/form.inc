@@ -32,7 +32,7 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     // models from the registry hook.
     $models = array();
     foreach ($applicable_paged_cmodels as $parent => $values) {
-      if (isset($values['parent']) && in_array($values['parent'], $object->models)) {
+      if (array_intersect(array_keys($values['parents']), $object->models)) {
         $models[$parent] = $parent;
       }
     }
@@ -99,7 +99,9 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
   $connection = islandora_get_tuque_connection();
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   $applicable_paged_cmodels = islandora_paged_content_retrieve_applicable_cmodels();
-  $predicate = $applicable_paged_cmodels[$form_state['values']['model']]['predicate'];
+  $parent = islandora_object_load($form_state['values']['parent']);
+  $parents = array_intersect_key($applicable_paged_cmodels[$form_state['values']['model']]['parents'], drupal_map_assoc($parent->models));
+  $predicate = reset($parents);
   $parameters = array(
     'target' => $form_state['values']['target'],
     'text' => $form_state['values']['extract_text'],
