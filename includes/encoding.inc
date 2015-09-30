@@ -27,7 +27,7 @@ function islandora_paged_content_pdf_batch_get_encoding_element() {
     $base += array(
       '#type' => 'select',
       '#empty_option' => t('Default Encoding'),
-      '#options' => $options,
+      '#options' => drupal_map_assoc($options),
     );
   }
   elseif ($options === FALSE) {
