@@ -18,6 +18,7 @@
  *   An array representing the form to be rendered.
  */
 function islandora_paged_content_pdf_batch_batch_form($form, $form_state, AbstractObject $object) {
+  form_load_include($form_state, 'inc', 'islandora_paged_content_pdf_batch', 'includes/encoding');
   module_load_include('inc', 'islandora_paged_content', 'includes/upload_pdf.form');
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   module_load_include('inc', 'islandora', 'includes/utilities');
@@ -71,6 +72,9 @@ function islandora_paged_content_pdf_batch_batch_form($form, $form_state, Abstra
     ),
     '#weight' => -19,
   );
+  $form['zip_encoding'] = islandora_paged_content_pdf_batch_get_encoding_element() + array(
+    '#weight' => -18,
+  );
   $form['parent'] = array(
     '#type' => 'value',
     '#value' => $object->id,
@@ -113,6 +117,7 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
     'namespace' => $form_state['values']['namespace'],
     'parent_relationship_uri' => FEDORA_RELS_EXT_URI,
     'parent_relationship_pred' => $predicate,
+    'zip_encoding' => $form_state['values']['zip_encoding'],
   );
   $preprocessor = new IslandoraPagedContentPDFBatch($connection, $parameters);
   file_usage_add($target, 'islandora_batch', 'islandora_batch_set', $preprocessor->getSetId());

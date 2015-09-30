@@ -16,6 +16,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
     'drupal dependencies' => array('islandora_batch',
       'islandora_paged_content',
       'islandora_paged_content_pdf_batch'),
+    'drush depdendencies' => array('islandora_batch'),
     'options' => array(
       'target' => array(
         'description' => dt('The path to the ZIP file to scan.'),
@@ -66,6 +67,10 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'description' => dt('The namespace for objects created by this command.  Defaults to namespace set in Fedora config.'),
         'required' => FALSE,
       ),
+      'zip_encoding' => array(
+        'description' => 'The encoding of filenames contained in ZIP archives. Defaults to the native encoding being used by PHP.',
+        'value' => 'optional',
+      ),
     ),
     'examples' => array(
       'drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content_model=islandora:bookCModel --parent=islandora:bookCollection' => t('Preprocessing paged content.'),
@@ -80,6 +85,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
  */
 function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
+  module_load_include('inc', 'islandora_batch', 'includes/utilities');
 
   // See if the target specified exists and is a ZIP.
   $target = drush_get_option('target');
@@ -91,6 +97,9 @@ function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
     $mime = file_get_mimetype($target);
     if (!in_array($mime, $allowed_zips)) {
       return drush_set_error('Invalid MIME', dt('The specified file is not a ZIP.'));
+    }
+    if (($message = islandora_batch_scan_check_encoding('zip', drush_get_option('zip_encoding'))) !== NULL) {
+      return drush_set_error('INVALID ENCODING', $message);
     }
   }
   else {
@@ -179,6 +188,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
     'parent_relationship_uri' => drush_get_option('parent_relationship_uri', FEDORA_RELS_EXT_URI),
     'parent_relationship_pred' => drush_get_option('parent_relationship_pred', 'isMemberOfCollection'),
     'namespace' => drush_get_option('namespace'),
+    'zip_encoding' => drush_get_option('zip_encoding'),
   );
 
   if ($text = drush_get_option('text', 'extract')) {
