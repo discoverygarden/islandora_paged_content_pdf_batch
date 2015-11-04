@@ -68,7 +68,11 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'required' => FALSE,
       ),
       'zip_encoding' => array(
-        'description' => 'The encoding of filenames contained in ZIP archives. Defaults to the native encoding being used by PHP.',
+        'description' => dt('The encoding of filenames contained in ZIP archives. Defaults to the native encoding being used by PHP.'),
+        'value' => 'optional',
+      ),
+      'rawtext' => array(
+        'description' => dt('A flag to force the raw text to be extracted when using pdftotext'),
         'value' => 'optional',
       ),
     ),
@@ -217,6 +221,12 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
   }
   else {
     $parameters['format'] = '300';
+  }
+  if ($raw_text = drush_get_option('rawtext', FALSE)) {
+    $parameters['rawtext'] = TRUE;
+  }
+  else {
+    $parameters['rawtext'] = FALSE;
   }
   $preprocessor = new IslandoraPagedContentPDFBatch($connection, $parameters);
   islandora_batch_handle_preprocessor($preprocessor);

@@ -154,6 +154,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
     $this->parentId = $parent_id;
     $this->sequenceNumber = $sequence;
     $this->textExtraction = $pp['text'];
+    $this->rawText = $pp['rawtext'];
     $this->language = $pp['language'];
     $this->displayFormat = $pp['format'];
     $this->resolution = $pp['resolution'];
@@ -195,7 +196,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
       return ISLANDORA_BATCH_STATE__ERROR;
     }
     if ($this->textExtraction == 'extract') {
-      $full_text = islandora_paged_content_extract_text_from_pdf($file->uri, $this->sequenceNumber);
+      $full_text = islandora_paged_content_extract_text_from_pdf($file->uri, $this->sequenceNumber, $this->rawText);
       if ($full_text) {
         islandora_paged_content_update_datastream($this, $full_text, 'OCR', 'OCR', 'text/plain', 'M', FALSE);
         $full_text_file = islandora_temp_file_entry($full_text);
