@@ -68,7 +68,11 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'required' => FALSE,
       ),
       'zip_encoding' => array(
-        'description' => 'The encoding of filenames contained in ZIP archives. Defaults to the native encoding being used by PHP.',
+        'description' => dt('The encoding of filenames contained in ZIP archives. Defaults to the native encoding being used by PHP.'),
+        'value' => 'optional',
+      ),
+      'rawtext' => array(
+        'description' => dt('A flag to force the raw text to be extracted when using pdftotext'),
         'value' => 'optional',
       ),
     ),
@@ -189,35 +193,12 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
     'parent_relationship_pred' => drush_get_option('parent_relationship_pred', 'isMemberOfCollection'),
     'namespace' => drush_get_option('namespace'),
     'zip_encoding' => drush_get_option('zip_encoding'),
+    'text' => drush_get_option('text', 'extract'),
+    'language' => drush_get_option('language', 'eng'),
+    'format' => drush_get_option('format', 'tiff32nc'),
+    'resolution' => drush_get_option('resolution', '300'),
+    'rawtext' => drush_get_option('rawtext', FALSE),
   );
-
-  if ($text = drush_get_option('text', 'extract')) {
-    $parameters['text'] = $text;
-  }
-  else {
-    $parameters['text'] = 'extract';
-  }
-
-  if ($language = drush_get_option('language', 'eng')) {
-    $parameters['language'] = $language;
-  }
-  else {
-    $parameters['language'] = 'eng';
-  }
-
-  if ($format = drush_get_option('format', 'tiff32nc')) {
-    $parameters['format'] = $format;
-  }
-  else {
-    $parameters['format'] = 'tiff32nc';
-  }
-
-  if ($resolution = drush_get_option('resolution', '300')) {
-    $parameters['resolution'] = $resolution;
-  }
-  else {
-    $parameters['format'] = '300';
-  }
   $preprocessor = new IslandoraPagedContentPDFBatch($connection, $parameters);
   islandora_batch_handle_preprocessor($preprocessor);
 }
