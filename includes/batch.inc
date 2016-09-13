@@ -114,8 +114,6 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
     $this->getMods();
     $this->getDc();
     islandora_paged_content_add_pdf_to_object($this, $file, TRUE);
-    // Use object_info to create some datastreams.
-    //$this->label = $file->filename;
     return ISLANDORA_BATCH_STATE__DONE;
   }
 }
