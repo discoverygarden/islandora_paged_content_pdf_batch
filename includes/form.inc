@@ -119,7 +119,7 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
     'parent_relationship_pred' => $predicate,
     'zip_encoding' => $form_state['values']['zip_encoding'],
   );
-  // Otherwise will complain if isn't set
+  // Otherwise will complain if isn't set.
   if (isset($form_state['values']['rawtext'])) {
     $parameters['rawtext'] = $form_state['values']['rawtext'] == 'yes' ? TRUE : FALSE;
   }
