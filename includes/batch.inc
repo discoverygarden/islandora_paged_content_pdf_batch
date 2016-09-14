@@ -79,13 +79,6 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
   }
 
   /**
-   * Returns the label as the title for the object.
-   */
-  public function getTitle() {
-    return $this->label;
-  }
-
-  /**
    * Get the children of the paged content parent.
    */
   public function getChildren(IslandoraTuque $connection) {
@@ -117,9 +110,10 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
   public function batchProcess() {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
     $file = file_load($this->objectInfo['pdf_file']);
+    $this->label = $this->getTitle();
+    $this->getMods();
+    $this->getDc();
     islandora_paged_content_add_pdf_to_object($this, $file, TRUE);
-    // Use object_info to create some datastreams.
-    $this->label = $file->filename;
     return ISLANDORA_BATCH_STATE__DONE;
   }
 }

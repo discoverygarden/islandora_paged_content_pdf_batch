@@ -118,8 +118,11 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
     'parent_relationship_uri' => FEDORA_RELS_EXT_URI,
     'parent_relationship_pred' => $predicate,
     'zip_encoding' => $form_state['values']['zip_encoding'],
-    'rawtext' => $form_state['values']['rawtext'] == 'yes' ? TRUE : FALSE,
   );
+  // Otherwise will complain if isn't set.
+  if (isset($form_state['values']['rawtext'])) {
+    $parameters['rawtext'] = $form_state['values']['rawtext'] == 'yes' ? TRUE : FALSE;
+  }
   $preprocessor = new IslandoraPagedContentPDFBatch($connection, $parameters);
   file_usage_add($target, 'islandora_batch', 'islandora_batch_set', $preprocessor->getSetId());
   if ($form_state['values']['ingest_set_immediately']) {
