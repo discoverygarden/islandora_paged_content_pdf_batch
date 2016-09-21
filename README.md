@@ -3,7 +3,7 @@
 ## Introduction
 
 This module extends the [Islandora Batch](https://github.com/islandora/islandora_batch) framework to facilitate the ingestion of
-a ZIP filled with one or more PDFs into paged content and individual page objects.
+a ZIP or directory filled with one or more PDFs and associated xml metdata files into paged content and individual page objects.
 
 The ingest is a two-step process:
 
