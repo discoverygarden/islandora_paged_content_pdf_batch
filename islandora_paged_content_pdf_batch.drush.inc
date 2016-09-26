@@ -94,7 +94,7 @@ function islandora_paged_content_pdf_batch_drush_command() {
 function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   module_load_include('inc', 'islandora_batch', 'includes/utilities');
-  $type = (drush_get_option('type') != NULL ? drush_get_option('type') : 'zip');
+  $type = drush_get_option('type', 'zip');
   // See if the target specified exists.
   $target = drush_get_option('target');
   if (file_exists($target)) {
@@ -192,7 +192,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
   drupal_static_reset('islandora_get_tuque_connection');
   $connection = islandora_get_tuque_connection();
   $parameters = array(
-    'type' => (drush_get_option('type') != NULL ? drush_get_option('type') : 'zip'),
+    'type' => drush_get_option('type', 'zip'),
     'target' => drush_get_option('target'),
     'content_model' => drush_get_option('content_model'),
     'parent' => drush_get_option('parent'),
