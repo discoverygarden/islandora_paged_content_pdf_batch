@@ -107,6 +107,7 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
   $parents = array_intersect_key($applicable_paged_cmodels[$form_state['values']['model']]['parents'], drupal_map_assoc($parent->models));
   $predicate = reset($parents);
   $parameters = array(
+    'type' => 'zip',
     'target' => $form_state['values']['target'],
     'text' => $form_state['values']['extract_text'],
     'language' => $form_state['values']['language'],

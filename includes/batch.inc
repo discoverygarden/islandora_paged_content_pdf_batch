@@ -17,13 +17,6 @@ class IslandoraPagedContentPDFBatch extends IslandoraScanBatch {
   }
 
   /**
-   * Get the type of the target resource.
-   */
-  protected function getTargetType() {
-    return 'zip';
-  }
-
-  /**
    * Preprocess all the things.
    */
   public function preprocess() {

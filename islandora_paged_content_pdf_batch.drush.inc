@@ -18,8 +18,12 @@ function islandora_paged_content_pdf_batch_drush_command() {
       'islandora_paged_content_pdf_batch'),
     'drush depdendencies' => array('islandora_batch'),
     'options' => array(
+      'type' => array(
+        'description' => dt('The target type: zip or directory. Defaults to zip.'),
+        'value' => 'optional',
+      ),
       'target' => array(
-        'description' => dt('The path to the ZIP file to scan.'),
+        'description' => dt('The path to the ZIP file or directory to scan.'),
         'required' => TRUE,
       ),
       'text' => array(
@@ -90,24 +94,26 @@ function islandora_paged_content_pdf_batch_drush_command() {
 function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
   module_load_include('inc', 'islandora_batch', 'includes/utilities');
-
-  // See if the target specified exists and is a ZIP.
+  $type = drush_get_option('type', 'zip');
+  // See if the target specified exists.
   $target = drush_get_option('target');
   if (file_exists($target)) {
-    $allowed_zips = array(
-      'application/zip',
-      'application/x-zip',
-    );
-    $mime = file_get_mimetype($target);
-    if (!in_array($mime, $allowed_zips)) {
-      return drush_set_error('Invalid MIME', dt('The specified file is not a ZIP.'));
-    }
-    if (($message = islandora_batch_scan_check_encoding('zip', drush_get_option('zip_encoding'))) !== NULL) {
-      return drush_set_error('INVALID ENCODING', $message);
+    if ($type == 'zip') {
+      $allowed_zips = array(
+        'application/zip',
+        'application/x-zip',
+      );
+      $mime = file_get_mimetype($target);
+      if (!in_array($mime, $allowed_zips)) {
+        return drush_set_error('Invalid MIME', dt('The specified file is not a ZIP.'));
+      }
+      if (($message = islandora_batch_scan_check_encoding('zip', drush_get_option('zip_encoding'))) !== NULL) {
+        return drush_set_error('INVALID ENCODING', $message);
+      }
     }
   }
   else {
-    return drush_set_error('Missing file', dt('Unable to locate the ZIP file specified at @zip.', array('@zip' => $target)));
+    return drush_set_error('Missing file', dt('Unable to locate the ZIP file or directory specified at @target.', array('@target' => $target)));
   }
   // See if pdfinfo is available.
   if (!islandora_paged_content_pdfinfo_availability()) {
@@ -186,6 +192,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
   drupal_static_reset('islandora_get_tuque_connection');
   $connection = islandora_get_tuque_connection();
   $parameters = array(
+    'type' => drush_get_option('type', 'zip'),
     'target' => drush_get_option('target'),
     'content_model' => drush_get_option('content_model'),
     'parent' => drush_get_option('parent'),
