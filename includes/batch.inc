@@ -247,7 +247,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
   }
 
   /**
-   * Returns array of enabled derivatives for page object.
+   * Returns array of enabled derivatives.
    */
   public function getEnabledDerivatives() {
     $destination_dsids = array();
