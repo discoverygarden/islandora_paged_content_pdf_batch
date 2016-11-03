@@ -107,6 +107,13 @@ class IslandoraPagedContentPDFBatchParentObject extends IslandoraScanBatchObject
     $this->getMods();
     $this->getDc();
     islandora_paged_content_add_pdf_to_object($this, $file, TRUE);
+    if ($this->preprocessorParameters['content_model'] == 'islandora:newspaperIssueCModel' && module_exists('islandora_newspaper')) {
+      module_load_include('inc', 'islandora_newspaper', 'includes/utilities');
+      $newspaper = islandora_object_load($this->preprocessorParameters['parent']);
+      $issues = islandora_newspaper_get_issues($newspaper);
+      $num_issues = count($issues) + 1;
+      $this->relationships->add(ISLANDORA_RELS_EXT_URI, 'isSequenceNumber', (string) $num_issues, TRUE);
+    }
     return ISLANDORA_BATCH_STATE__DONE;
   }
 }
@@ -162,15 +169,19 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
     module_load_include('inc', 'islandora', 'includes/utilities');
     $file = file_load($this->pdfFile);
-    $pdf = islandora_paged_content_chop_pdf($file->uri, $this->sequenceNumber);
-    if ($pdf) {
-      islandora_paged_content_update_datastream($this, $pdf, 'PDF', 'PDF', 'application/pdf', 'M');
-      $pdf_file = islandora_temp_file_entry($pdf);
-      file_usage_add($pdf_file, 'islandora_batch', 'islandora_batch_object', $this->getBatchId());
-    }
-    else {
-      watchdog('islandora_paged_content_pdf_batch', 'Unable to chop a PDF from the PDF for @pid.', array('@pid' => $this->id));
-      return ISLANDORA_BATCH_STATE__ERROR;
+
+    $enabled_derivatives = $this->getEnabledDerivatives();
+    if (in_array('PDF', $enabled_derivatives)) {
+      $pdf = islandora_paged_content_chop_pdf($file->uri, $this->sequenceNumber);
+      if ($pdf) {
+        islandora_paged_content_update_datastream($this, $pdf, 'PDF', 'PDF', 'application/pdf', 'M');
+        $pdf_file = islandora_temp_file_entry($pdf);
+        file_usage_add($pdf_file, 'islandora_batch', 'islandora_batch_object', $this->getBatchId());
+      }
+      else {
+        watchdog('islandora_paged_content_pdf_batch', 'Unable to chop a PDF from the PDF for @pid.', array('@pid' => $this->id));
+        return ISLANDORA_BATCH_STATE__ERROR;
+      }
     }
     $tif = islandora_paged_content_extract_tiff_from_pdf($file->uri, $this->sequenceNumber, $this->displayFormat, $this->resolution);
     if ($tif) {
@@ -182,7 +193,7 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
       watchdog('islandora_paged_content_pdf_batch', 'Unable to extract a TIF from the PDF for @pid.', array('@pid' => $this->id));
       return ISLANDORA_BATCH_STATE__ERROR;
     }
-    if ($this->textExtraction == 'extract') {
+    if ($this->textExtraction == 'extract' && in_array('OCR', $enabled_derivatives)) {
       $full_text = islandora_paged_content_extract_text_from_pdf($file->uri, $this->sequenceNumber, TRUE, $this->rawText);
       if ($full_text) {
         islandora_paged_content_update_datastream($this, $full_text, 'OCR', 'OCR', 'text/plain', 'M', FALSE);
@@ -218,18 +229,32 @@ class IslandoraPagedContentPDFBatchPageObject extends IslandoraScanBatchObject {
     islandora_paged_content_set_relationship($rels_ext, ISLANDORA_RELS_EXT_URI, 'isSection', '1', TRUE);
     islandora_paged_content_set_relationship($rels_ext, FEDORA_RELS_EXT_URI, 'isMemberOf', $this->parentId);
 
-    if ($this->textExtraction == "none") {
-      $generate_ocr = 'FALSE';
-    }
-    else {
-      $generate_ocr = 'TRUE';
-    }
-    $this->relationships->add(ISLANDORA_RELS_EXT_URI, 'generate_ocr', $generate_ocr, RELS_TYPE_PLAIN_LITERAL);
-    if ($generate_ocr == 'TRUE') {
-      islandora_paged_content_set_relationship($rels_ext, ISLANDORA_RELS_EXT_URI, 'hasLanguage', $this->language, TRUE);
+    if (in_array('OCR', $this->getEnabledDerivatives())) {
+      if ($this->textExtraction == "none") {
+        $generate_ocr = 'FALSE';
+      }
+      else {
+        $generate_ocr = 'TRUE';
+      }
+      $this->relationships->add(ISLANDORA_RELS_EXT_URI, 'generate_ocr', $generate_ocr, RELS_TYPE_PLAIN_LITERAL);
+      if ($generate_ocr == 'TRUE') {
+        islandora_paged_content_set_relationship($rels_ext, ISLANDORA_RELS_EXT_URI, 'hasLanguage', $this->language, TRUE);
+      }
     }
     // Add content model relationship.
     $paged_cmodels = islandora_paged_content_retrieve_applicable_cmodels();
     $this->models = array_keys($paged_cmodels[$this->parentCModel]['children']);
+  }
+
+  /**
+   * Returns array of enabled derivatives for page object.
+   */
+  public function getEnabledDerivatives() {
+    $destination_dsids = array();
+    $derivatives = $hooks = islandora_invoke_hook_list(ISLANDORA_DERIVATIVE_CREATION_HOOK, $this->models, array($this));
+    foreach ($derivatives as $derivative) {
+      $destination_dsids[] = $derivative['destination_dsid'];
+    }
+    return $destination_dsids;
   }
 }
