@@ -124,6 +124,10 @@ function islandora_paged_content_pdf_batch_batch_form_submit($form, $form_state)
   if (isset($form_state['values']['rawtext'])) {
     $parameters['rawtext'] = $form_state['values']['rawtext'] == 'yes' ? TRUE : FALSE;
   }
+  else {
+    $parameters['rawtext'] = FALSE;
+  }
+
   $preprocessor = new IslandoraPagedContentPDFBatch($connection, $parameters);
   file_usage_add($target, 'islandora_batch', 'islandora_batch_set', $preprocessor->getSetId());
   if ($form_state['values']['ingest_set_immediately']) {
