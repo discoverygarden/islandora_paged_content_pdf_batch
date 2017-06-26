@@ -22,10 +22,6 @@ function islandora_paged_content_pdf_batch_drush_command() {
         'description' => dt('The target type: zip or directory. Defaults to zip.'),
         'value' => 'optional',
       ),
-      'target' => array(
-        'description' => dt('The path to the ZIP file or directory to scan.'),
-        'required' => TRUE,
-      ),
       'text' => array(
         'description' => dt('One of the following options: "extract" to pull the text out of the PDF, "ocr" to run OCR against the PDF or "none". Defaults to "extract"'),
         'value' => 'optional',
@@ -81,10 +77,22 @@ function islandora_paged_content_pdf_batch_drush_command() {
       ),
     ),
     'examples' => array(
-      'drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content_model=islandora:bookCModel --parent=islandora:bookCollection' => t('Preprocessing paged content.'),
+      'drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --scan_target=/path/to/archive.zip --content_model=islandora:bookCModel --parent=islandora:bookCollection' => t('Preprocessing paged content.'),
     ),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
   );
+  if (DRUSH_VERSION >= 7) {
+    $items['islandora_paged_content_pdf_batch_preprocess']['options']['scan_target'] = array(
+      'description' => 'The target to directory or zip file to scan.',
+      'required' => TRUE,
+    );
+  }
+  else {
+    $items['islandora_paged_content_pdf_batch_preprocess']['options']['target'] = array(
+      'description' => 'The target to directory or zip file to scan.',
+      'required' => TRUE,
+    );
+  }
   return $items;
 }
 
@@ -96,7 +104,12 @@ function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
   module_load_include('inc', 'islandora_batch', 'includes/utilities');
   $type = drush_get_option('type', 'zip');
   // See if the target specified exists.
-  $target = drush_get_option('target');
+  if (DRUSH_VERSION >= 7) {
+    $target = drush_get_option('scan_target');
+  }
+  else {
+    $target = drush_get_option('target');
+  }
   if (file_exists($target)) {
     if ($type == 'zip') {
       $allowed_zips = array(
@@ -141,7 +154,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess_validate() {
     module_load_include('inc', 'islandora_paged_content_pdf_batch', 'includes/utilities');
     $valid_languages = islandora_paged_content_pdf_batch_available_languages();
     if (!in_array($language, $valid_languages)) {
-      return drush_set_error('Invalid language entered', dt('The specified language, !language, is not valid. Languages available are: @lang.', array(
+      return drush_set_error('Invalid language entered', dt('The specified language, !language, is not valid. Languages available are: @lang.  If list is empty, please refresh the Islandora OCR module languages.', array(
         '!language' => $language,
         '@lang' => implode(', ', $valid_languages),
       )));
@@ -193,7 +206,7 @@ function drush_islandora_paged_content_pdf_batch_preprocess() {
   $connection = islandora_get_tuque_connection();
   $parameters = array(
     'type' => drush_get_option('type', 'zip'),
-    'target' => drush_get_option('target'),
+    'target' => DRUSH_VERSION >= 7 ? drush_get_option('scan_target') : drush_get_option('target'),
     'content_model' => drush_get_option('content_model'),
     'parent' => drush_get_option('parent'),
     'parent_relationship_uri' => drush_get_option('parent_relationship_uri', FEDORA_RELS_EXT_URI),
