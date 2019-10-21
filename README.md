@@ -34,13 +34,23 @@ The base ZIP preprocessor can be called as a drush script (see `drush help islan
 Drush made the `target` parameter reserved as of Drush 7. To allow for backwards compatability this will be preserved.
 The `target` option requires the full path to your archive from root directory. e.g. /var/www/drupal/sites/archive.zip
 
+The `parent_relationship_pred` defaults to `isMemberOfCollection`. If ingesting newspaper issues into a Newspaper parent object, this must be set to `isMemberOf`.
+
 Drush 7 and above:
 
+For books:
 `drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --scan_target=/path/to/archive.zip --content_model=islandora:bookCModel --parent=islandora:bookCollection`
+
+For newspaper issues:
+`drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --scan_target=/path/to/archive.zip --content_model=islandora:newspaperIssueCModel --parent=islandora:my_newspaper --parent_relationship_pred=isMemberOf`
 
 Drush 6 and below:
 
+For books:
 `drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content_model=islandora:bookCModel --parent=islandora:bookCollection`
+
+For newspaper issues:
+`drush -v -u 1 --uri=http://localhost islandora_paged_content_pdf_batch_preprocess --target=/path/to/archive.zip --content_model=islandora:newspaperIssueCModel --parent=islandora:my_newspaper --parent_relationship_pred=isMemberOf`
 
 This will populate the queue (stored in the Drupal database) with base entries.
 
